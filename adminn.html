@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver / Travel Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #FFDEE9, #B5FFFC, #FF9A9E, #FAD0C4, #FBC2EB);
+            font-family: 'Poppins', sans-serif;
+            animation: gradientBG 10s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .portal-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h2 {
+            color:  rgb(45, 42, 42);
+            margin-bottom: 20px;
+            font-size: 26px;
+        }
+
+        .portal-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: rgba(255, 255, 255, 0.3);
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            color: rgb(45, 42, 42);
+        }
+
+        .portal-btn:hover {
+            background:  rgba(203, 166, 166, 0.274);
+            color: #0A2342;
+            transform: scale(1.05);
+        }
+
+        .portal-btn:active {
+            transform: scale(0.98);
+        }
+
+        .logo {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .portal-container {
+                width: 90%;
+                padding: 30px;
+            }
+
+            .portal-btn {
+                font-size: 16px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="portal-container">
+        <img src="../STATIC/bus.png" class="logo" alt="Logo">
+        <h2>Driver / Travel Portal</h2>
+        <button class="portal-btn" onclick="window.location.href='register.html'">Driver Registration</button>
+        <button class="portal-btn" onclick="window.location.href='view.html'">View Buses Data</button>
+    </div>
+</body>
+</html>

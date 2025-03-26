@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Bus Driver/Travel Registration</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #FFDEE9, #B5FFFC, #FF9A9E, #FAD0C4, #FBC2EB);
+            font-family: 'Poppins', sans-serif;
+            animation: gradientBG 10s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 6px;
+        }
+
+        input {
+            background: #f0f0f0;
+        }
+
+        button {
+            background: #007BFF;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>E-Bus Driver/Travel Registration</h1>
+        <div id="alert" class="alert" style="display: none;"></div>
+        <input type="text" id="name" placeholder="Name">
+        <input type="email" id="email" placeholder="Email">
+        <input type="tel" id="phone" placeholder="Phone Number">
+        <input type="text" id="licenseNumber" placeholder="Driving License Number">
+        <input type="text" id="address" placeholder="Address">
+        <input type="password" id="password" placeholder="Password">
+        <button id="registerButton" onclick="registerDriver()">Register</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAzk2Q8v1l6DNpRtxgfi567bjweXBwypUY",
+            authDomain: "e-bus-4fd84.firebaseapp.com",
+            databaseURL: "https://e-bus-4fd84-default-rtdb.firebaseio.com/",
+            projectId: "e-bus-4fd84",
+            storageBucket: "e-bus-4fd84.appspot.com",
+            messagingSenderId: "313600716838",
+            appId: "1:313600716838:web:064714dd98aff6694e36e7",
+            measurementId: "G-R3R7KKLZJL"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        window.registerDriver = async function () {
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const licenseNumber = document.getElementById('licenseNumber').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!name || !email || !phone || !licenseNumber || !address || !password) {
+                showAlert('Please fill out all fields!', 'error');
+                return;
+            }
+
+            if (!/^[0-9]{10}$/.test(phone)) {
+                showAlert('Please enter a valid 10-digit phone number!', 'error');
+                return;
+            }
+
+            try {
+                const driversRef = ref(database, "drivers");
+                const newDriverRef = push(driversRef);
+
+                await set(newDriverRef, {
+                    name: name,
+                    email: email,
+                    phone: phone,
+                    licenseNumber: licenseNumber,
+                    address: address,
+                    password: password,
+                    registeredAt: new Date().toISOString()
+                });
+
+                showAlert('Driver registered successfully!', 'success');
+                clearForm();
+            } catch (error) {
+                console.error('Error registering driver:', error);
+                showAlert(`Error: ${error.message}`, 'error');
+            }
+        };
+
+        function clearForm() {
+            document.querySelectorAll('input').forEach(input => input.value = '');
+        }
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alert');
+            alertBox.innerText = message;
+            alertBox.className = `alert alert-${type}`;
+            alertBox.style.display = 'block';
+            setTimeout(() => alertBox.style.display = 'none', 3000);
+        }
+    </script>
+</body>
+
+</html>

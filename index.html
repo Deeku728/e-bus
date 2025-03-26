@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #FFDEE9, #B5FFFC, #FF9A9E, #FAD0C4, #FBC2EB);
+            font-family: 'Poppins', sans-serif;
+            animation: gradientBG 10s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .heading {
+            width: 100%;
+            background: #ff7eb3;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 40px;
+            border-radius: 15px;
+            backdrop-filter: blur(15px);
+            box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+            margin-top: 80px;
+        }
+
+        h2 {
+            color: rgb(251, 94, 94);
+            margin-bottom: 20px;
+        }
+
+        .login-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+            color: white;
+        }
+
+        .login-btn:nth-child(3) {
+            background: linear-gradient(45deg, #ff7eb3, #ff758c);
+        }
+
+        .login-btn:nth-child(4) {
+            background: linear-gradient(45deg, #57c1eb, #246fa8);
+        }
+
+        .login-btn:nth-child(5) {
+            background: linear-gradient(45deg, #ffb347, #ffcc33);
+        }
+
+        .login-btn:hover {
+            opacity: 0.9;
+            transform: scale(1.05);
+        }
+
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        .logo {
+            width: 100px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                width: 90%;
+                padding: 30px;
+            }
+
+            .login-btn {
+                font-size: 16px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="heading">
+        <h1>🚍 Welcome to E-Bus Portal - Seamless. Smart. Sustainable.</h1>
+        <p>Seamless. Smart. Sustainable.</p>
+        <p>Your one-stop solution for hassle-free bus bookings, real-time tracking, and seamless travel management. Choose your role and get started now! 🚀</p>
+    </div>
+    <div class="container">
+        <img src="../STATIC/bus.png" class="logo" alt="Logo">
+        <h2>Login Portal</h2>
+        <button class="login-btn" onclick="window.location.href='adminlogin.html'">Admin Login</button>
+        <button class="login-btn" onclick="window.location.href='driverslogin.html'">Driver / Travel Login</button>
+        <button class="login-btn" onclick="window.location.href='userr.html'">User Login</button>
+    </div>
+</body>
+</html>

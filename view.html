@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Bookings</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+         body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #FFDEE9, #B5FFFC, #FF9A9E, #FAD0C4, #FBC2EB);
+            font-family: 'Poppins', sans-serif;
+            animation: gradientBG 10s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .bookings-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background: #0288D1;
+            color: white;
+        }
+        td {
+            background: #E3F2FD;
+        }
+        .no-data {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        canvas {
+            max-width: 600px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bookings-container">
+        <h2>All Bookings</h2>
+        <table id="bookings-table">
+            <thead>
+                <tr>
+                    <th>Booking ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Gender</th>
+                    <th>Bus Number</th>
+                    <th>Bus Route</th>
+                    <th>Booked At</th>
+                </tr>
+            </thead>
+            <tbody id="bookings-list">
+                <tr><td colspan="8" class="no-data">Loading bookings...</td></tr>
+            </tbody>
+        </table>
+        <canvas id="bookingsChart"></canvas>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAzk2Q8v1l6DNpRtxgfi567bjweXBwypUY",
+            authDomain: "e-bus-4fd84.firebaseapp.com",
+            databaseURL: "https://e-bus-4fd84-default-rtdb.firebaseio.com/",
+            projectId: "e-bus-4fd84",
+            storageBucket: "e-bus-4fd84.appspot.com",
+            messagingSenderId: "313600716838",
+            appId: "1:313600716838:web:064714dd98aff6694e36e7",
+            measurementId: "G-R3R7KKLZJL"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const bookingsRef = ref(database, "bookings");
+
+        get(bookingsRef).then(snapshot => {
+            const bookingsList = document.getElementById("bookings-list");
+            bookingsList.innerHTML = ""; // Clear loading message
+
+            if (snapshot.exists()) {
+                const bookingsData = snapshot.val();
+                let hasData = false;
+                let busRoutes = {}; // Store bus routes for chart
+
+                Object.keys(bookingsData).forEach(bookingId => {
+                    const booking = bookingsData[bookingId];
+
+                    if (booking && booking.busDetails && booking.user) {
+                        const bookedAtFormatted = new Date(booking.bookedAt).toLocaleString();
+
+                        // Track bus route count
+                        busRoutes[booking.busDetails.busRoute] = (busRoutes[booking.busDetails.busRoute] || 0) + 1;
+
+                        const row = `<tr>
+                            <td>${bookingId}</td>
+                            <td>${booking.user.name || "N/A"}</td>
+                            <td>${booking.user.email || "N/A"}</td>
+                            <td>${booking.user.phone || "N/A"}</td>
+                            <td>${booking.user.gender || "N/A"}</td>
+                            <td>${booking.busDetails.busNumber || "N/A"}</td>
+                            <td>${booking.busDetails.busRoute || "N/A"}</td>
+                            <td>${bookedAtFormatted}</td>
+                        </tr>`;
+                        bookingsList.innerHTML += row;
+                        hasData = true;
+                    }
+                });
+
+                if (!hasData) {
+                    bookingsList.innerHTML = `<tr><td colspan="8" class="no-data">No bookings found</td></tr>`;
+                } else {
+                    generateChart(busRoutes);
+                }
+            } else {
+                bookingsList.innerHTML = `<tr><td colspan="8" class="no-data">No bookings found</td></tr>`;
+            }
+        }).catch(error => {
+            console.error("Error fetching bookings:", error);
+            document.getElementById("bookings-list").innerHTML = `<tr><td colspan="8" class="no-data">Error loading bookings</td></tr>`;
+        });
+
+        function generateChart(busRoutes) {
+            const ctx = document.getElementById("bookingsChart").getContext("2d");
+            new Chart(ctx, {
+                type: "bar",
+                data: {
+                    labels: Object.keys(busRoutes),
+                    datasets: [{
+                        label: "Bookings per Route",
+                        data: Object.values(busRoutes),
+                        backgroundColor: "rgba(2, 136, 209, 0.7)",
+                        borderColor: "rgba(2, 136, 209, 1)",
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

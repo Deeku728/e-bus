@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Booking Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+         body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #FFDEE9, #B5FFFC, #FF9A9E, #FAD0C4, #FBC2EB);
+            font-family: 'Poppins', sans-serif;
+            animation: gradientBG 10s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: #007BFF;
+            color: #fff;
+        }
+
+        button {
+            padding: 10px 15px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        .user-form {
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .user-form label {
+            font-weight: bold;
+            display: block;
+            margin-top: 10px;
+        }
+
+        .user-form input,
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Available Buses</h1>
+
+        <div class="user-form">
+            <h3>Enter Your Details</h3>
+            <label for="name">Name:</label>
+            <input type="text" id="name" placeholder="Enter your name">
+
+            <label for="phone">Phone Number:</label>
+            <input type="tel" id="phone" placeholder="Enter your phone number">
+
+            <label for="email">Email ID:</label>
+            <input type="email" id="email" placeholder="Enter your email">
+
+            <label for="gender">Gender:</label>
+            <select id="gender">
+                <option value="">Select Gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+
+        <table id="busTable">
+            <thead>
+                <tr>
+                    <th>Bus Number</th>
+                    <th>Route</th>
+                    <th>Type</th>
+                    <th>Contact</th>
+                    <th>Book</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Bus details will be populated here -->
+            </tbody>
+        </table>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, get, set, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAzk2Q8v1l6DNpRtxgfi567bjweXBwypUY",
+            authDomain: "e-bus-4fd84.firebaseapp.com",
+            databaseURL: "https://e-bus-4fd84-default-rtdb.firebaseio.com/",
+            projectId: "e-bus-4fd84",
+            storageBucket: "e-bus-4fd84.appspot.com",
+            messagingSenderId: "313600716838",
+            appId: "1:313600716838:web:064714dd98aff6694e36e7",
+            measurementId: "G-R3R7KKLZJL"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        const busTable = document.getElementById("busTable").querySelector("tbody");
+
+        function fetchBuses() {
+            const routesRef = ref(database, "routes");
+            get(routesRef).then(snapshot => {
+                if (snapshot.exists()) {
+                    const buses = snapshot.val();
+                    busTable.innerHTML = "";
+                    Object.keys(buses).forEach(key => {
+                        const bus = buses[key];
+                        const row = `<tr>
+                    <td>${bus.busNumber}</td>
+                    <td>${bus.busRoute}</td>
+                    <td>${bus.busType}</td>
+                    <td>${bus.contactNumber}</td>
+                    <td><button onclick="bookBus('${key}', '${bus.busNumber}', '${bus.busRoute}')">Book</button></td>
+                </tr>`;
+                        busTable.innerHTML += row;
+                    });
+                }
+            });
+        }
+
+        window.bookBus = function (busId, busNumber, busRoute) {
+            const name = document.getElementById("name").value;
+            const phone = document.getElementById("phone").value;
+            const email = document.getElementById("email").value;
+            const gender = document.getElementById("gender").value;
+
+            if (!name || !phone || !email || !gender) {
+                alert("Please fill in all details before booking.");
+                return;
+            }
+
+            const bookingsRef = ref(database, "bookings");
+            const newBookingRef = push(bookingsRef);
+
+            set(newBookingRef, {
+                user: {
+                    name: name,
+                    phone: phone,
+                    email: email,
+                    gender: gender
+                },
+                busDetails: {
+                    busId: busId,
+                    busNumber: busNumber,
+                    busRoute: busRoute
+                },
+                bookedAt: new Date().toISOString()
+            }).then(() => {
+                alert("Bus booked successfully!");
+            }).catch(error => {
+                console.error("Error booking bus:", error);
+            });
+        };
+
+        fetchBuses();
+
+    </script>
+</body>
+
+</html>

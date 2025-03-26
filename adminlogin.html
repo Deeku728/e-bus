@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login & Driver Registration</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module">
+        // Firebase Integration
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyAzk2Q8v1l6DNpRtxgfi567bjweXBwypUY",
+          authDomain: "e-bus-4fd84.firebaseapp.com",
+          projectId: "e-bus-4fd84",
+          storageBucket: "e-bus-4fd84.appspot.com",
+          messagingSenderId: "313600716838",
+          appId: "1:313600716838:web:064714dd98aff6694e36e7",
+          measurementId: "G-R3R7KKLZJL"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        window.adminLogin = function() {
+            const username = document.getElementById('adminUsername').value;
+            const password = document.getElementById('adminPassword').value;
+
+            signInWithEmailAndPassword(auth, username, password)
+                .then((userCredential) => {
+                    alert('Login successful! Redirecting to registration page...');
+                    window.location.href = 'adminn.html'; // Redirect to the registration page
+                })
+                .catch((error) => {
+                    alert('Invalid credentials or user not found!');
+                });
+        }
+    </script>
+    <style>
+        /* Global Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #FFDEE9, #B5FFFC, #FF9A9E, #FAD0C4, #FBC2EB);
+            font-family: 'Poppins', sans-serif;
+            animation: gradientBG 10s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 6px;
+        }
+
+        input {
+            background: #f0f0f0;
+        }
+
+        button {
+            background: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        button:hover {
+            background: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="adminLogin">
+        <h1>Admin Login</h1>
+        <input type="email" id="adminUsername" placeholder="Email">
+        <input type="password" id="adminPassword" placeholder="Password">
+        <button onclick="adminLogin()">Login</button>
+    </div>
+</body>
+</html>

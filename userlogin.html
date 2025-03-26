@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Login</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #FFDEE9, #B5FFFC, #FF9A9E, #FAD0C4, #FBC2EB);
+            font-family: 'Poppins', sans-serif;
+            animation: gradientBG 10s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .login-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #007BFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .register-link {
+            background: none;
+            color: #007BFF;
+            text-decoration: underline;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h2>Login</h2>
+        <input type="email" id="email" placeholder="Enter Email">
+        <input type="password" id="password" placeholder="Enter Password">
+        <button onclick="loginUser()">Login</button>
+        <p id="error-msg" style="color: red;"></p>
+        <button class="register-link" onclick="window.location.href='users.html'">Register Here</button>
+    </div>
+    
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAzk2Q8v1l6DNpRtxgfi567bjweXBwypUY",
+            authDomain: "e-bus-4fd84.firebaseapp.com",
+            databaseURL: "https://e-bus-4fd84-default-rtdb.firebaseio.com/",
+            projectId: "e-bus-4fd84",
+            storageBucket: "e-bus-4fd84.appspot.com",
+            messagingSenderId: "313600716838",
+            appId: "1:313600716838:web:064714dd98aff6694e36e7",
+            measurementId: "G-R3R7KKLZJL"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        window.loginUser = function () {
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            const errorMsg = document.getElementById("error-msg");
+            
+            if (!email || !password) {
+                errorMsg.textContent = "Please enter email and password";
+                return;
+            }
+            
+            const usersRef = ref(database, "users");
+            get(usersRef).then(snapshot => {
+                if (snapshot.exists()) {
+                    const users = snapshot.val();
+                    let foundUser = null;
+                    
+                    Object.keys(users).forEach(key => {
+                        if (users[key].email === email && users[key].password === password) {
+                            foundUser = key;
+                        }
+                    });
+                    
+                    if (foundUser) {
+                        localStorage.setItem("userId", foundUser);
+                        window.location.href = "book.html";
+                    } else {
+                        errorMsg.textContent = "Invalid email or password";
+                    }
+                } else {
+                    errorMsg.textContent = "No users found";
+                }
+            }).catch(error => {
+                console.error("Error fetching users:", error);
+                errorMsg.textContent = "An error occurred";
+            });
+        }
+    </script>
+</body>
+</html>

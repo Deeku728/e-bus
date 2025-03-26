@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver/Travel Login</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+         body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #FFDEE9, #B5FFFC, #FF9A9E, #FAD0C4, #FBC2EB);
+            font-family: 'Poppins', sans-serif;
+            animation: gradientBG 10s ease infinite;
+            background-size: 400% 400%;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 6px;
+        }
+
+        input {
+            background: #f0f0f0;
+        }
+
+        button {
+            background: #007BFF;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .alert {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 6px;
+        }
+
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Driver/Travel Login</h1>
+        <div id="alert" class="alert" style="display: none;"></div>
+        <input type="email" id="email" placeholder="Email">
+        <input type="password" id="password" placeholder="Password">
+        <button id="loginButton" onclick="loginDriver()">Login</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, get, child } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAzk2Q8v1l6DNpRtxgfi567bjweXBwypUY",
+            authDomain: "e-bus-4fd84.firebaseapp.com",
+            databaseURL: "https://e-bus-4fd84-default-rtdb.firebaseio.com/",
+            projectId: "e-bus-4fd84",
+            storageBucket: "e-bus-4fd84.appspot.com",
+            messagingSenderId: "313600716838",
+            appId: "1:313600716838:web:064714dd98aff6694e36e7",
+            measurementId: "G-R3R7KKLZJL"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        window.loginDriver = async function () {
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!email || !password) {
+                showAlert('Please enter email and password!', 'error');
+                return;
+            }
+
+            try {
+                const dbRef = ref(database);
+                const snapshot = await get(child(dbRef, "drivers"));
+                if (snapshot.exists()) {
+                    let found = false;
+                    snapshot.forEach(driver => {
+                        const data = driver.val();
+                        if (data.email === email && data.password === password) {
+                            found = true;
+                            showAlert('Login successful! Redirecting...', 'success');
+                            setTimeout(() => {
+                                window.location.href = "route.html";
+                            }, 1500);
+                        }
+                    });
+                    if (!found) {
+                        showAlert('Invalid email or password!', 'error');
+                    }
+                } else {
+                    showAlert('No drivers registered!', 'error');
+                }
+            } catch (error) {
+                console.error('Error logging in:', error);
+                showAlert(`Error: ${error.message}`, 'error');
+            }
+        };
+
+        function showAlert(message, type) {
+            const alertBox = document.getElementById('alert');
+            alertBox.innerText = message;
+            alertBox.className = `alert alert-${type}`;
+            alertBox.style.display = 'block';
+            setTimeout(() => alertBox.style.display = 'none', 3000);
+        }
+    </script>
+</body>
+
+</html>
